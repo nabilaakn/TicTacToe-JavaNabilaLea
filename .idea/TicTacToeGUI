@@ -1,0 +1,83 @@
+/**
+ * ES234317-Algorithm and Data Structures
+ * Semester Ganjil, 2024/2025
+ * Group Capstone Project
+ * Group #15
+ * 1 - 5026231025 - Nabila Rahadatul Aisy Koestriyaningrum
+ * 2 - 5026231214 - Michelle Lea Amanda
+ */
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TicTacToeGUI extends JFrame {
+    private TicTacToeGame game;
+    private JButton[][] buttons;
+    private MusicPlayer musicPlayer;
+    private boolean isXTurn = true;
+    private String difficulty = "Easy";
+
+    public TicTacToeGUI() {
+        game = new TicTacToeGame();
+        buttons = new JButton[3][3];
+        musicPlayer = new MusicPlayer();
+        initializeGUI();
+        musicPlayer.playMusic("\"D:\\DOWNLOAD\\TICTACTOE.wav\".wav");
+    }
+
+    private void initializeGUI() {
+        setTitle("Tic Tac Toe");
+        setSize(500, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        JPanel boardPanel = new JPanel(new GridLayout(3, 3));
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j] = new JButton("");
+                buttons[i][j].setFont(new Font("Arial", Font.BOLD, 60));
+                final int row = i;
+                final int col = j;
+                buttons[i][j].addActionListener(e -> handleButtonClick(row, col));
+                boardPanel.add(buttons[i][j]);
+            }
+        }
+
+        JButton resetButton = new JButton("Reset");
+        resetButton.addActionListener(e -> resetGame());
+
+        add(boardPanel, BorderLayout.CENTER);
+        add(resetButton, BorderLayout.SOUTH);
+    }
+
+
+
+    private void handleButtonClick(int row, int col) {
+        if (game.makeMove(row, col)) {
+            buttons[row][col].setText(String.valueOf(game.getCurrentPlayer()));
+            char winner = game.checkWinner();
+            if (winner != ' ') {
+                JOptionPane.showMessageDialog(this, "Player " + winner + " wins!");
+                resetGame();
+            } else if (game.isBoardFull()) {
+                JOptionPane.showMessageDialog(this, "It's a draw!");
+                resetGame();
+            } else {
+                game.switchPlayer();
+            }
+        }
+    }
+
+    private void resetGame() {
+        game.resetBoard();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j].setText("");
+            }
+            musicPlayer.stopMusic();
+            musicPlayer.playMusic("\"D:\\DOWNLOAD\\TICTACTOE.wav\".wav");// Restart musik setelah reset
+        }
+        }
+    }
