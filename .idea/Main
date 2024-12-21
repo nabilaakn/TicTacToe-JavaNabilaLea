@@ -7,12 +7,28 @@
  * 2 - 5026231214 - Michelle Lea Amanda
  */
 
+import javax.swing.*;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            TicTacToeGUI gameGUI = new TicTacToeGUI();
-            gameGUI.setVisible(true);
-        });
-    }
-}
+                SwingUtilities.invokeLater(() -> {
+                    String[] options = {"Pemain vs Pemain", "Pemain vs Komputer"};
+                    int choice = JOptionPane.showOptionDialog(
+                            null,
+                            "Pilih mode permainan:",
+                            "Mode Permainan",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            options,
+                            options[0]
+                    );
+
+                    boolean isVsComputer = (choice == 1); // untuk memilih "Pemain vs Komputer"
+                    new TicTacToeGUI(isVsComputer); // Membuka GUI berdasarkan mode yang dipilih
+                });
+            }
+        }
+
+
