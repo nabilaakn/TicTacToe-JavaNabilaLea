@@ -6,25 +6,21 @@
  * 1 - 5026231025 - Nabila Rahadatul Aisy Koestriyaningrum
  * 2 - 5026231214 - Michelle Lea Amanda
  */
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class TicTacToeGUI extends JFrame {
     private TicTacToeGame game;
     private JButton[][] buttons;
-    private MusicPlayer musicPlayer;
-    private boolean isXTurn = true;
-    private String difficulty = "Easy";
+    private boolean isVsComputer;
 
-    public TicTacToeGUI() {
-        game = new TicTacToeGame();
+    public TicTacToeGUI(boolean isVsComputer) {
+        this.isVsComputer = isVsComputer;
+        game = new TicTacToeGame(isVsComputer);
         buttons = new JButton[3][3];
-        musicPlayer = new MusicPlayer();
+
         initializeGUI();
-        musicPlayer.playMusic("\"D:\\DOWNLOAD\\TICTACTOE.wav\".wav");
+        setVisible(true);
     }
 
     private void initializeGUI() {
@@ -33,11 +29,12 @@ public class TicTacToeGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        // Panel papan permainan
         JPanel boardPanel = new JPanel(new GridLayout(3, 3));
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 buttons[i][j] = new JButton("");
-                buttons[i][j].setFont(new Font("Arial", Font.BOLD, 60));
+                buttons[i][j].setFont(new Font("Arial", Font.BOLD, 40));
                 final int row = i;
                 final int col = j;
                 buttons[i][j].addActionListener(e -> handleButtonClick(row, col));
@@ -45,6 +42,7 @@ public class TicTacToeGUI extends JFrame {
             }
         }
 
+        // Tombol reset
         JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(e -> resetGame());
 
@@ -52,21 +50,42 @@ public class TicTacToeGUI extends JFrame {
         add(resetButton, BorderLayout.SOUTH);
     }
 
-
-
     private void handleButtonClick(int row, int col) {
         if (game.makeMove(row, col)) {
             buttons[row][col].setText(String.valueOf(game.getCurrentPlayer()));
-            char winner = game.checkWinner();
-            if (winner != ' ') {
-                JOptionPane.showMessageDialog(this, "Player " + winner + " wins!");
-                resetGame();
-            } else if (game.isBoardFull()) {
-                JOptionPane.showMessageDialog(this, "It's a draw!");
-                resetGame();
-            } else {
-                game.switchPlayer();
+            checkGameState();
+
+            if (isVsComputer && game.getCurrentPlayer() == 'O') {
+                makeComputerMove(); 
             }
+        }
+    }
+
+    private void makeComputerMove() {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                Thread.sleep(500); 
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            game.makeComputerMove();
+            int[] lastMove = game.getLastMove();
+            buttons[lastMove[0]][lastMove[1]].setText(String.valueOf(game.getCurrentPlayer()));
+            checkGameState();
+        });
+    }
+
+    private void checkGameState() {
+        char winner = game.checkWinner();
+        if (winner != ' ') {
+            JOptionPane.showMessageDialog(this, "Player " + winner + " wins!");
+            resetGame();
+        } else if (game.isBoardFull()) {
+            JOptionPane.showMessageDialog(this, "It's a draw!");
+            resetGame();
+        } else {
+            game.switchPlayer();
         }
     }
 
@@ -76,8 +95,6 @@ public class TicTacToeGUI extends JFrame {
             for (int j = 0; j < 3; j++) {
                 buttons[i][j].setText("");
             }
-            musicPlayer.stopMusic();
-            musicPlayer.playMusic("\"D:\\DOWNLOAD\\TICTACTOE.wav\".wav");// Restart musik setelah reset
-        }
         }
     }
+}
